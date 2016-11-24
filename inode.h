@@ -4,11 +4,11 @@
 #include <sys/stat.h>
 
 typedef enum inode_type{
-  FILE
+  FILE,
   DIR
 } inode_type;
 
-struct ram_inode{
+typedef struct ram_inode{
   int id;
 
   char* name;
@@ -18,6 +18,6 @@ struct ram_inode{
 
   char* data;
 
-}
+} ram_inode;
 
 #endif
