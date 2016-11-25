@@ -9,10 +9,11 @@
 
 #include "fuse_opers.h"
 
-int fs_size;
+unsigned int fs_size;
 
 void create_inode(char* path){
   printf("%s \n", path);
+  test_func();
 }
 
 void init_fs(){
@@ -22,8 +23,8 @@ void init_fs(){
 }
 
 static struct fuse_operations hello_oper = {
-	.getattr	= ramdisk_getattr
-/*	.readdir	= ramdisk_readdir,
+	.getattr	= ramdisk_getattr,
+	.readdir	= ramdisk_readdir,
 	.open		= ramdisk_open,
 	.read		= ramdisk_read,
   .write = ramdisk_write,
@@ -31,7 +32,7 @@ static struct fuse_operations hello_oper = {
   .mkdir = ramdisk_mkdir,
   .rmdir = ramdisk_rmdir,
   .opendir = ramdisk_opendir,
-  .unlink = ramdisk_unlink*/
+  .unlink = ramdisk_unlink
 };
 
 int main(int argc, char *argv[])
@@ -43,7 +44,7 @@ int main(int argc, char *argv[])
   }
   //File system size(in MB) provided by the user
   int fs_size_mb = atoi(argv[2]);
-  fs_size = fs_size_mb * 1024 *1024;
+  fs_size = fs_size_mb * 1024 * 1024;
 
   init_fs();
 
