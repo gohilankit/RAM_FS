@@ -5,10 +5,13 @@
 
 #include "tree.h"
 
+/*Linux has a maximum filename length of 255 characters for most filesystems
+(including EXT4), and a maximum path of 4096 characters. */
 #define MAX_PATH_LENGTH 512
 
-//root is global variable declared in tree.h
+//global variables declared in tree.h
 TreeNode* root;
+char new_entry_name[256];
 
 TreeNode* get_node_from_path(char* path){
   char path_copy[MAX_PATH_LENGTH];
@@ -42,6 +45,14 @@ TreeNode* get_node_from_path(char* path){
       if(token == NULL ){
         return curr;
       }
+    }else{
+      /* If entry not found(not in children of start_node)
+      1. Copy the token in a global variable for new entry
+      2. Return the parent(start_node)
+      This is required for mkdir where last token is name of the directory
+      and path before that is the parent directory*/
+      strcpy(new_entry_name, token);
+      return start_node;
     }
 
     start_node = curr;
