@@ -1,8 +1,16 @@
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "tree.h"
 
 #define MAX_PATH_LENGTH 512
 
-TreeNode* get_node_from_path(TreeNode* root, char* path){
+//root is global variable declared in tree.h
+TreeNode* root;
+
+TreeNode* get_node_from_path(char* path){
   char path_copy[MAX_PATH_LENGTH];
 
   strcpy(path_copy, path);
@@ -16,8 +24,8 @@ TreeNode* get_node_from_path(TreeNode* root, char* path){
 //else
   int found = 0;
 
-  Node* start_node = root;
-  Node* curr = NULL;
+  TreeNode* start_node = root;
+  TreeNode* curr = NULL;
 
   while(token){
     curr = start_node->firstChild;
@@ -32,7 +40,7 @@ TreeNode* get_node_from_path(TreeNode* root, char* path){
     if(found) {
       token = strtok(NULL, "/");
       if(token == NULL ){
-        return temp;
+        return curr;
       }
     }
 
@@ -40,4 +48,19 @@ TreeNode* get_node_from_path(TreeNode* root, char* path){
     found = 0;
   }
   return NULL;
+}
+
+void add_child(TreeNode* parent, TreeNode* new_child){
+  if(parent == NULL || new_child == NULL)
+    return;
+
+  if(parent->firstChild != NULL){
+    TreeNode* curr = parent->firstChild;
+    while(curr->nextSibling != NULL){
+      curr = curr->nextSibling;
+    }
+    curr->nextSibling = new_child;
+  }else{
+    parent->firstChild = new_child;
+  }
 }

@@ -1,14 +1,24 @@
 
 #include <stdio.h>
 #include "fuse_opers.h"
+#include "tree.h"
+
+//root is global variable declared in tree.h
+TreeNode* root;
 
 int test_func(){
-  printf("%d \n", fs_size);
+  printf("%s \n", root->name);
   return 1;
 }
 
 int ramdisk_getattr(const char* path, struct stat* stbuf){
   printf("In getattr \n");
+  //int retVal = 0;
+
+  //Todo
+  //Validate path
+
+  //Node* node = get_node_from_path()
   return 1;
 }
 

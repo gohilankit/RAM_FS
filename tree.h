@@ -14,6 +14,10 @@ typedef struct TreeNode{
   char* data;
 } TreeNode;
 
-TreeNode* get_node_from_path(TreeNode* root, char* path);
+extern TreeNode* root;
+
+TreeNode* get_node_from_path(char* path);
+
+void add_child(TreeNode* parent, TreeNode* new_child);
 
 #endif

@@ -44,6 +44,7 @@ void create_root_node(){
   curr_size += (sizeof(TreeNode) + sizeof(ram_inode) + sizeof(char));
 
   printf("%d \n", curr_size);
+  printf("%s \n", root->name);
 
   test_func();
 }
