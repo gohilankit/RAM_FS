@@ -18,8 +18,9 @@ TreeNode* root;
 void create_root_node(){
   //Create node for root directory
   root = (TreeNode*)malloc(sizeof(TreeNode));
-  root->inode = (ram_inode*)malloc(sizeof(struct ram_inode));
+  root->inode = (ram_inode*)malloc(sizeof(ram_inode));
 
+  root->name = (char*)malloc(sizeof(char));
   strcpy(root->name, "/");
 
   root->inode->type = TYPE_DIR;
