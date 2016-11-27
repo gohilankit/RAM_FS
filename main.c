@@ -27,6 +27,8 @@ void create_root_node(){
 
   root->data = NULL;
 
+  root->inode->mode = S_IFDIR | 0755;
+
   root->parent = NULL;
   root->firstChild = NULL;
   root->nextSibling = NULL;
@@ -36,6 +38,12 @@ void create_root_node(){
   root->inode->atime = curr_time;
   root->inode->mtime = curr_time;
   root->inode->ctime = curr_time;
+
+  printf("%d \n", curr_size);
+  //Update disk (sizeof(char)
+  curr_size += (sizeof(TreeNode) + sizeof(ram_inode) + sizeof(char));
+
+  printf("%d \n", curr_size);
 
   test_func();
 }
