@@ -8,19 +8,41 @@
 #include <fcntl.h>
 
 #include "fuse_opers.h"
+#include "tree.h"
 
 unsigned int fs_size;
+unsigned int curr_size;
 
-void create_inode(char* path){
-  printf("%s \n", path);
+TreeNode* root;
+
+void create_root_node(){
+  //Create node for root directory
+  root = (TreeNode*)malloc(sizeof(TreeNode));
+  root->inode = (ram_inode*)malloc(sizeof(struct ram_inode));
+
+  strcpy(root->name, "/");
+
+  root->inode->type = TYPE_DIR;
+
+  root->data = NULL;
+
+  root->parent = NULL;
+  root->firstChild = NULL;
+  root->nextSibling = NULL;
+
+  time_t curr_time;
+  time(&curr_time);
+  root->inode->atime = curr_time;
+  root->inode->mtime = curr_time;
+  root->inode->ctime = curr_time;
+
   test_func();
 }
 
 void init_fs(){
-  //Create inode for root directory
-  char* root_path = "/";
-  create_inode(root_path);
+  create_root_node();
 }
+
 
 static struct fuse_operations hello_oper = {
 	.getattr	= ramdisk_getattr,

@@ -4,10 +4,11 @@
 #include <sys/stat.h>
 
 typedef enum inode_type{
-  FILE,
-  DIR
+  TYPE_FILE,
+  TYPE_DIR
 } inode_type;
 
+//Similar to struct stat
 typedef struct ram_inode{
   int id;
 
@@ -16,7 +17,10 @@ typedef struct ram_inode{
   int size;
   mode_t mode;
 
-  char* data;
+  //Time attributes
+  time_t atime;     /* time of last access */
+  time_t mtime;     /* time of last modification */
+  time_t ctime;     /* time of last status change */
 
 } ram_inode;
 
