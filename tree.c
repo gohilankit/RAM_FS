@@ -125,6 +125,30 @@ void add_child(TreeNode* parent, TreeNode* new_child){
   new_child->parent = parent;
 }
 
+void detach_child(TreeNode* parent, TreeNode* node_to_delete){
+  //If node to delete is the first child
+  if(parent->firstChild == node_to_delete){
+    if(node_to_delete->nextSibling == NULL){
+      //If node to delete is the only child, remove linking
+      parent->firstChild = NULL;
+    }else{
+      //Make parent's first child to point to next sibling
+      parent->firstChild = node_to_delete->nextSibling;
+    }
+  }else{
+    //Iterate to reach the desired node
+    TreeNode* curr = parent->firstChild;
+
+    while(curr){
+      if(curr->nextSibling == node_to_delete){
+        curr->nextSibling = node_to_delete->nextSibling;
+        break;
+      }
+      curr=curr->nextSibling;
+    }
+  }
+}
+
 int validatePath(const char *path)
 {
         char tmpPath[MAX_PATH_LENGTH];

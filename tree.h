@@ -24,6 +24,7 @@ TreeNode* create_file_node(char* name, mode_t mode);
 TreeNode* get_node_from_path(const char* path);
 
 void add_child(TreeNode* parent, TreeNode* new_child);
+void detach_child(TreeNode* parent, TreeNode* node_to_delete);
 
 int validatePath(const char *path);
 

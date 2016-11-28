@@ -149,7 +149,27 @@ int ramdisk_mkdir_test(){
 
 int ramdisk_rmdir(const char* path){
   printf("In rmdir \n");
-  return 0;
+  if(validatePath(path) != 0){
+    return -ENOENT;
+  }
+//else
+  TreeNode* node_to_delete = get_node_from_path(path);
+
+  if(node_to_delete->firstChild){
+    //Directory is not empty, don't delete. Throw error
+    return -ENOTEMPTY;
+  }else{
+    TreeNode* parent = node_to_delete->parent;
+    detach_child(parent, node_to_delete);
+
+    free(node_to_delete->inode);
+    free(node_to_delete);
+
+    //Update current file system size
+    curr_size += (sizeof(ram_inode) + sizeof(TreeNode));
+
+    return 0;
+  }
 }
 
 int ramdisk_opendir(const char* path, struct fuse_file_info* fi){
