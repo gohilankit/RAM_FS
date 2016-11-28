@@ -20,18 +20,18 @@ char new_entry_name[256];
 unsigned int fs_size;
 unsigned int curr_size;
 
-TreeNode* create_node(char* name, mode_t mode, inode_type type){
+TreeNode* create_node(char* name, mode_t mode, inode_type type, int size){
   TreeNode* node = (TreeNode*)malloc(sizeof(TreeNode));
   node->inode = (ram_inode*)malloc(sizeof(ram_inode));
 
   strcpy(node->name, name);
 
   node->inode->type = type;
-  node->inode->mode = S_IFDIR | 0755;
+  node->inode->mode = mode;
 
   node->inode->uid = getuid();
   node->inode->gid = getgid();
-  node->inode->size = MAX_PATH_LENGTH;
+  node->inode->size = size;
 
   node->data = NULL;
 
@@ -52,13 +52,17 @@ TreeNode* create_node(char* name, mode_t mode, inode_type type){
 }
 
 TreeNode* create_dir_node(char* name, mode_t mode){
+  int size = MAX_PATH_LENGTH;
   inode_type type = TYPE_DIR;
-  return create_node(name, mode, type);
+  mode_t type_mode = S_IFDIR | 0755;
+  return create_node(name, type_mode, type, size);
 }
 
 TreeNode* create_file_node(char* name, mode_t mode){
+  int size = 0;
   inode_type type = TYPE_FILE;
-  return create_node(name, mode, type);
+  mode_t type_mode = S_IFREG | mode;
+  return create_node(name, type_mode, type, size);
 }
 
 TreeNode* get_node_from_path(const char* path){

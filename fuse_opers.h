@@ -19,12 +19,13 @@ int ramdisk_write(const char* path, const char *buf, size_t size, off_t offset, 
 int ramdisk_create(const char *, mode_t, struct fuse_file_info *);
 
 int ramdisk_mkdir(const char *, mode_t);
-int ramdisk_mkdir_test();
 
 int ramdisk_rmdir(const char *);
 
 int ramdisk_opendir(const char* path, struct fuse_file_info* fi);
 
 int ramdisk_unlink(const char *);
+
+int ramdisk_utime(const char* path, struct utimbuf* ubuf);
 
 #endif

@@ -79,22 +79,97 @@ int ramdisk_open(const char* path, struct fuse_file_info* fi){
   return 0;
 }
 
+/*read
+Read 'size' bytes into buf, beginning offset. Returns
+a. number of bytes transferred,
+b. 0 if offset was at or beyond the end of the file.
+*/
 int ramdisk_read(const char* path, char* buf, size_t size, off_t offset,
   struct fuse_file_info* fi){
-
   printf("In read \n");
-  return 0;
+
+  if(validatePath(path) == -1){
+    return -ENOENT;
+  }
+//else
+  TreeNode* node = get_node_from_path(path);
+  if(node->inode->type == TYPE_DIR){
+    //Can't perform read as it's a directory
+    return -EISDIR;
+  }
+
+  size_t file_length = node->inode->size;
+  if(offset > file_length){
+    size = 0;
+  }else{
+    if(offset+size > file_length){
+      size = file_length - offset;
+    }
+    memcpy(buf, node->data + offset, size);
+    time_t curr_time;
+    time(&curr_time);
+    node->inode->atime = curr_time;
+  }
+
+  return size;
 }
 
 int ramdisk_write(const char* path, const char *buf, size_t size, off_t offset,
   struct fuse_file_info* fi){
 
   printf("In write \n");
-  return 0;
+
+  if(validatePath(path) == -1){
+    return -ENOENT;
+  }
+//else
+  if(curr_size + size > fs_size){
+    //No space left on filesystem
+    return -ENOSPC;
+  }
+
+  TreeNode* node = get_node_from_path(path);
+  if(node->inode->type == TYPE_DIR){
+    //Can't perform read as it's a directory
+    return -EISDIR;
+  }
+
+  if(size > 0){
+    if(node->data == NULL){
+      node->data = (char*) malloc(sizeof(char)*size);
+      memcpy(node->data, buf, size);
+
+      curr_size += size;
+    }else{
+      node->data = (char*) realloc(node->data, sizeof(char)*(offset + size));
+      memcpy(node->data + offset, buf, size);
+    }
+  }
+
+  //Update disk size
+
+
+  return size;
 }
 
 int ramdisk_create(const char* path, mode_t mode, struct fuse_file_info* fi){
-  printf("In create \n");
+  printf("In create for path : %s \n", path);
+  if(path == NULL){
+    return -ENOENT;
+  }
+
+  //Check if assigning a new node doesn't exceed the max file size
+  if(curr_size + sizeof(TreeNode) + sizeof(ram_inode) > fs_size){
+    return -ENOSPC;
+  }
+
+  //Get parent node
+  TreeNode* parent = get_node_from_path(path);
+
+  TreeNode* new_entry = create_file_node(new_entry_name, mode);
+
+  add_child(parent, new_entry);
+  printf("Create ends\n");
   return 0;
 }
 
@@ -119,31 +194,6 @@ int ramdisk_mkdir(const char* path, mode_t mode){
 
   add_child(parent, new_entry);
   printf("Mkdir ends\n");
-  return 0;
-}
-
-/*Create directory with @path as name and @mode as permissions */
-int ramdisk_mkdir_test(){
-
-  //Check if assigning a new node doesn't exceed the max file size
-  if(curr_size + sizeof(TreeNode) + sizeof(ram_inode) > fs_size){
-      return -ENOSPC;
-  }
-
-  const char* path = "/a";
-  mode_t mode = S_IFDIR | 0755;
-  //Get parent node
-  TreeNode* parent = get_node_from_path(path);
-  printf("Parent = %s \n", parent->name);
-
-  TreeNode* new_entry = create_dir_node(new_entry_name, mode);
-  printf("New entry = %s \n", new_entry->name);
-
-  add_child(parent, new_entry);
-
-  printf("New entry's child = %s \n", new_entry->parent->name);
-  printf("Parent's child = %s \n", parent->firstChild->name);
-
   return 0;
 }
 
@@ -179,5 +229,10 @@ int ramdisk_opendir(const char* path, struct fuse_file_info* fi){
 
 int ramdisk_unlink(const char* path){
   printf("In unlink \n");
+  return 0;
+}
+
+int ramdisk_utime(const char* path, struct utimbuf* ubuf){
+  printf("In untime \n");
   return 0;
 }

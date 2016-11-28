@@ -67,8 +67,10 @@ static struct fuse_operations hello_oper = {
   .create = ramdisk_create,
   .rmdir = ramdisk_rmdir,
   .opendir = ramdisk_opendir,
-  .unlink = ramdisk_unlink
+  .unlink = ramdisk_unlink,
+  .utime = ramdisk_utime    /*for touch command*/
 };
+/*rename, fsync*/
 
 
 int main(int argc, char *argv[])
