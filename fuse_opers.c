@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "fuse_opers.h"
 #include "tree.h"
@@ -13,11 +14,6 @@ unsigned int curr_size;
 //global variables declared in tree.h
 TreeNode* root;
 char new_entry_name[256];
-
-int test_func(){
-  printf("%s \n", root->name);
-  return 1;
-}
 
 int ramdisk_getattr(const char* path, struct stat* stbuf){
   printf("In getattr for path : %s \n", path);
@@ -134,21 +130,35 @@ int ramdisk_write(const char* path, const char *buf, size_t size, off_t offset,
     return -EISDIR;
   }
 
+  size_t file_length = node->inode->size;
+
   if(size > 0){
     if(node->data == NULL){
+      offset = 0;
       node->data = (char*) malloc(sizeof(char)*size);
-      memcpy(node->data, buf, size);
+    }else{  /*Realloc new memory location for more data*/
+      //If offset to write is more than current file length, adjust the offset
+      if(offset > file_length)
+        offset = file_length;
 
-      curr_size += size;
-    }else{
-      node->data = (char*) realloc(node->data, sizeof(char)*(offset + size));
-      memcpy(node->data + offset, buf, size);
+      char* new_block = (char*) realloc(node->data, sizeof(char)*(offset + size));
+      if(new_block == NULL){
+        return -ENOSPC;
+      }else{
+        node->data = new_block;
+      }
     }
+
+    memcpy(node->data + offset, buf, size);
+    curr_size += (offset + size - node->inode->size); /*Update disk size */
+    node->inode->size = offset+size;  /*Update inode size*/
+
+    //Update create & modified time
+    time_t curr_time;
+    time(&curr_time);
+    node->inode->ctime = curr_time;
+    node->inode->mtime = curr_time;
   }
-
-  //Update disk size
-
-
   return size;
 }
 
@@ -229,6 +239,30 @@ int ramdisk_opendir(const char* path, struct fuse_file_info* fi){
 
 int ramdisk_unlink(const char* path){
   printf("In unlink \n");
+
+  if(validatePath(path) != 0){
+    return -ENOENT;
+  }
+//else
+  TreeNode* node_to_delete = get_node_from_path(path);
+  if(node_to_delete->inode->type == TYPE_DIR){
+    //Can't unlink as the node is a directory
+    return -EISDIR;
+  }
+
+  TreeNode* parent = node_to_delete->parent;
+  detach_child(parent, node_to_delete);
+
+  if(node_to_delete->inode->size != 0){
+    free(node_to_delete->data);
+    curr_size -= node_to_delete->inode->size;
+  }
+
+  free(node_to_delete->inode);
+  free(node_to_delete);
+
+  curr_size -= (sizeof(TreeNode) + sizeof(ram_inode));
+
   return 0;
 }
 

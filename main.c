@@ -49,8 +49,6 @@ void create_root_node(){
   //Update disk
   curr_size += (sizeof(TreeNode) + sizeof(ram_inode));
 
-  //test_func();
-  //ramdisk_mkdir_test();
 }
 
 void init_fs(){
