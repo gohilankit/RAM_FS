@@ -51,6 +51,25 @@ int ramdisk_readdir(const char* path, void* buf, fuse_fill_dir_t filler,
                     off_t offset, struct fuse_file_info* fi){
 
     printf("In readdir for path : %s \n", path);
+
+    if(validatePath(path) == -1)
+      return -ENOENT;
+    //else
+    TreeNode* dir = get_node_from_path(path);
+    TreeNode* curr = dir->firstChild;
+
+    filler(buf, ".", NULL, 0);
+    filler(buf, "..", NULL, 0);
+
+    while(curr){
+      filler(buf, curr->name, NULL, 0);
+      curr = curr->nextSibling;
+    }
+
+    time_t curr_time;
+    time(&curr_time);
+    dir->inode->atime = curr_time;
+
     return 0;
 }
 
