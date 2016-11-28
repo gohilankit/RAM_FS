@@ -70,8 +70,18 @@ int ramdisk_readdir(const char* path, void* buf, fuse_fill_dir_t filler,
 }
 
 int ramdisk_open(const char* path, struct fuse_file_info* fi){
-
   printf("In open \n");
+
+  if(validatePath(path) != 0){
+    return -ENOENT;
+  }
+
+  TreeNode* node = get_node_from_path(path);
+
+  if(node->inode->type == TYPE_DIR){
+    return -EISDIR;
+  }
+
   return 0;
 }
 
@@ -179,7 +189,7 @@ int ramdisk_create(const char* path, mode_t mode, struct fuse_file_info* fi){
   TreeNode* new_entry = create_file_node(new_entry_name, mode);
 
   add_child(parent, new_entry);
-  printf("Create ends\n");
+  /*Create ends. File size is updated in create_node*/
   return 0;
 }
 
@@ -192,9 +202,7 @@ int ramdisk_mkdir(const char* path, mode_t mode){
 
   //Check if assigning a new node doesn't exceed the max file size
   if(curr_size + sizeof(TreeNode) + sizeof(ram_inode) > fs_size){
-      printf("FS Size = %d \n", fs_size);
-      printf("Curr Size = %ld \n", (curr_size + sizeof(TreeNode) + sizeof(ram_inode)) );
-      return -ENOSPC;
+    return -ENOSPC;
   }
 
   //Get parent node
@@ -203,7 +211,7 @@ int ramdisk_mkdir(const char* path, mode_t mode){
   TreeNode* new_entry = create_dir_node(new_entry_name, mode);
 
   add_child(parent, new_entry);
-  printf("Mkdir ends\n");
+  /* Mkdir ends. Filesystem size is updated in create_node. */
   return 0;
 }
 
@@ -226,7 +234,7 @@ int ramdisk_rmdir(const char* path){
     free(node_to_delete);
 
     //Update current file system size
-    curr_size += (sizeof(ram_inode) + sizeof(TreeNode));
+    curr_size -= (sizeof(ram_inode) + sizeof(TreeNode));
 
     return 0;
   }
@@ -234,6 +242,17 @@ int ramdisk_rmdir(const char* path){
 
 int ramdisk_opendir(const char* path, struct fuse_file_info* fi){
   printf("In opendir \n");
+
+  if(validatePath(path) != 0){
+    return -ENOENT;
+  }
+
+  TreeNode* node = get_node_from_path(path);
+
+  if(node->inode->type != TYPE_DIR){
+    return -ENOTDIR;
+  }
+
   return 0;
 }
 
