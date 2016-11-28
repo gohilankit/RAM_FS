@@ -12,10 +12,14 @@ typedef enum inode_type{
 typedef struct ram_inode{
   int id;
 
-  char* name;
+  //char* name;
   inode_type type;
   int size;
   mode_t mode;
+
+  // Owner
+  uid_t uid;
+  gid_t gid;
 
   //Time attributes
   time_t atime;     /* time of last access */
