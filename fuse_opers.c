@@ -18,7 +18,7 @@ char new_entry_name[256];
 int ramdisk_getattr(const char* path, struct stat* stbuf){
   int res = 0;
 
-  if(validatePath(path) == 0){
+  if(validate_path(path) == 0){
 
     TreeNode* node = get_node_from_path(path);
 
@@ -32,6 +32,7 @@ int ramdisk_getattr(const char* path, struct stat* stbuf){
     stbuf->st_uid = node->inode->uid;
     stbuf->st_gid = node->inode->gid;
 
+
     stbuf->st_size = node->inode->size;
     res = 0;
   }else{
@@ -43,7 +44,7 @@ int ramdisk_getattr(const char* path, struct stat* stbuf){
 int ramdisk_readdir(const char* path, void* buf, fuse_fill_dir_t filler,
                     off_t offset, struct fuse_file_info* fi){
 
-    if(validatePath(path) == -1)
+    if(validate_path(path) == -1)
       return -ENOENT;
     //else
     TreeNode* dir = get_node_from_path(path);
@@ -65,7 +66,7 @@ int ramdisk_readdir(const char* path, void* buf, fuse_fill_dir_t filler,
 }
 
 int ramdisk_open(const char* path, struct fuse_file_info* fi){
-  if(validatePath(path) != 0){
+  if(validate_path(path) != 0){
     return -ENOENT;
   }
 
@@ -86,7 +87,7 @@ b. 0 if offset was at or beyond the end of the file.
 int ramdisk_read(const char* path, char* buf, size_t size, off_t offset,
   struct fuse_file_info* fi){
 
-  if(validatePath(path) == -1){
+  if(validate_path(path) == -1){
     return -ENOENT;
   }
 //else
@@ -115,7 +116,7 @@ int ramdisk_read(const char* path, char* buf, size_t size, off_t offset,
 int ramdisk_write(const char* path, const char *buf, size_t size, off_t offset,
   struct fuse_file_info* fi){
 
-  if(validatePath(path) == -1){
+  if(validate_path(path) == -1){
     return -ENOENT;
   }
 //else
@@ -204,7 +205,7 @@ int ramdisk_mkdir(const char* path, mode_t mode){
 }
 
 int ramdisk_rmdir(const char* path){
-  if(validatePath(path) != 0){
+  if(validate_path(path) != 0){
     return -ENOENT;
   }
 //else
@@ -228,7 +229,7 @@ int ramdisk_rmdir(const char* path){
 }
 
 int ramdisk_opendir(const char* path, struct fuse_file_info* fi){
-  if(validatePath(path) != 0){
+  if(validate_path(path) != 0){
     return -ENOENT;
   }
 
@@ -242,7 +243,7 @@ int ramdisk_opendir(const char* path, struct fuse_file_info* fi){
 }
 
 int ramdisk_unlink(const char* path){
-  if(validatePath(path) != 0){
+  if(validate_path(path) != 0){
     return -ENOENT;
   }
 //else
@@ -273,11 +274,11 @@ int ramdisk_utime(const char* path, struct utimbuf* ubuf){
 }
 
 int ramdisk_rename(const char *from, const char *to){
-  if(validatePath(from) != 0){
+  if(validate_path(from) != 0){
     return -ENOENT;
   }
 //else
-/*  int is_to_valid = validatePath(to);
+/*  int is_to_valid = validate_path(to);
 
   TreeNode* from_node = get_node_from_path(from);
   TreeNode* to_node = get_node_from_path(to);

@@ -71,43 +71,44 @@ a. 0, if the path exists
 b. 1, if path till parent exists and a new node with last token needs to be created
 c. -1, if even the parent path doesn't exist
 */
-int validatePath(const char *path){
+int validate_path(const char *path){
   char path_copy[MAX_PATH_LENGTH];
   strcpy(path_copy, path);
   char *token = strtok(path_copy, "/");
 
+  //Root path found
   if(token == NULL && (strcmp(path, "/") == 0)){
     return 0;
-  }else{
-    int found = 0;
-    TreeNode *start_node  = root;
-    TreeNode *curr = NULL;
+  }
+//else
+  int found = 0;
+  TreeNode *start_node  = root;
+  TreeNode *curr = NULL;
 
-    while(token != NULL) {
-    	curr = start_node->firstChild;
-      while(curr) {
-      	if(strcmp(curr->name, token) == 0 ){
-          found = 1;
-          break;
-        }
-        curr = curr->nextSibling;
+  while(token != NULL) {
+  	curr = start_node->firstChild;
+    while(curr) {
+    	if(strcmp(token, curr->name) == 0 ){
+        found = 1;
+        break;
       }
-
-      token = strtok(NULL, "/");
-
-      if(found) {
-      	if( token == NULL )
-          return 0;
-      }else{
-        if (token)
-        	return -1;
-        else
-        	return 1;
-      }
-
-      start_node = curr;
-      found = 0;
+      curr = curr->nextSibling;
     }
+
+    token = strtok(NULL, "/");
+
+    if(found) {
+    	if( token == NULL )
+        return 0;
+    }else{
+      if (token)
+      	return -1;
+      else
+      	return 1;
+    }
+
+    start_node = curr;
+    found = 0;
   }
   //If it reaches here, it's not found
   return -1;
