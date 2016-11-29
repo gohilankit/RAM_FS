@@ -16,7 +16,6 @@ TreeNode* root;
 char new_entry_name[256];
 
 int ramdisk_getattr(const char* path, struct stat* stbuf){
-  printf("In getattr for path : %s \n", path);
   int res = 0;
 
   if(validatePath(path) == 0){
@@ -33,10 +32,8 @@ int ramdisk_getattr(const char* path, struct stat* stbuf){
     stbuf->st_uid = node->inode->uid;
     stbuf->st_gid = node->inode->gid;
 
-    //stbuf->st_size = 2028;
     stbuf->st_size = node->inode->size;
     res = 0;
-    printf("getattr ends normally for path : %s \n", path);
   }else{
     res = -ENOENT;
   }
@@ -45,8 +42,6 @@ int ramdisk_getattr(const char* path, struct stat* stbuf){
 
 int ramdisk_readdir(const char* path, void* buf, fuse_fill_dir_t filler,
                     off_t offset, struct fuse_file_info* fi){
-
-    printf("In readdir for path : %s \n", path);
 
     if(validatePath(path) == -1)
       return -ENOENT;
@@ -70,8 +65,6 @@ int ramdisk_readdir(const char* path, void* buf, fuse_fill_dir_t filler,
 }
 
 int ramdisk_open(const char* path, struct fuse_file_info* fi){
-  printf("In open \n");
-
   if(validatePath(path) != 0){
     return -ENOENT;
   }
@@ -92,7 +85,6 @@ b. 0 if offset was at or beyond the end of the file.
 */
 int ramdisk_read(const char* path, char* buf, size_t size, off_t offset,
   struct fuse_file_info* fi){
-  printf("In read \n");
 
   if(validatePath(path) == -1){
     return -ENOENT;
@@ -122,8 +114,6 @@ int ramdisk_read(const char* path, char* buf, size_t size, off_t offset,
 
 int ramdisk_write(const char* path, const char *buf, size_t size, off_t offset,
   struct fuse_file_info* fi){
-
-  printf("In write \n");
 
   if(validatePath(path) == -1){
     return -ENOENT;
@@ -173,7 +163,6 @@ int ramdisk_write(const char* path, const char *buf, size_t size, off_t offset,
 }
 
 int ramdisk_create(const char* path, mode_t mode, struct fuse_file_info* fi){
-  printf("In create for path : %s \n", path);
   if(path == NULL){
     return -ENOENT;
   }
@@ -195,7 +184,6 @@ int ramdisk_create(const char* path, mode_t mode, struct fuse_file_info* fi){
 
 /*Create directory with @path as name and @mode as permissions */
 int ramdisk_mkdir(const char* path, mode_t mode){
-  printf("In mkdir \n");
   if(path == NULL){
     return -ENOENT;
   }
@@ -216,7 +204,6 @@ int ramdisk_mkdir(const char* path, mode_t mode){
 }
 
 int ramdisk_rmdir(const char* path){
-  printf("In rmdir \n");
   if(validatePath(path) != 0){
     return -ENOENT;
   }
@@ -241,8 +228,6 @@ int ramdisk_rmdir(const char* path){
 }
 
 int ramdisk_opendir(const char* path, struct fuse_file_info* fi){
-  printf("In opendir \n");
-
   if(validatePath(path) != 0){
     return -ENOENT;
   }
@@ -257,8 +242,6 @@ int ramdisk_opendir(const char* path, struct fuse_file_info* fi){
 }
 
 int ramdisk_unlink(const char* path){
-  printf("In unlink \n");
-
   if(validatePath(path) != 0){
     return -ENOENT;
   }
@@ -286,6 +269,22 @@ int ramdisk_unlink(const char* path){
 }
 
 int ramdisk_utime(const char* path, struct utimbuf* ubuf){
-  printf("In untime \n");
+  return 0;
+}
+
+int ramdisk_rename(const char *from, const char *to){
+  if(validatePath(from) != 0){
+    return -ENOENT;
+  }
+//else
+/*  int is_to_valid = validatePath(to);
+
+  TreeNode* from_node = get_node_from_path(from);
+  TreeNode* to_node = get_node_from_path(to);
+
+  if(is_to_valid){  //'to' path already exists
+
+}*/
+
   return 0;
 }

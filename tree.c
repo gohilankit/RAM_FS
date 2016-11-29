@@ -65,6 +65,54 @@ TreeNode* create_file_node(char* name, mode_t mode){
   return create_node(name, type_mode, type, size);
 }
 
+/*
+Validates the given path. Returns
+a. 0, if the path exists
+b. 1, if path till parent exists and a new node with last token needs to be created
+c. -1, if even the parent path doesn't exist
+*/
+int validatePath(const char *path){
+  char path_copy[MAX_PATH_LENGTH];
+  strcpy(path_copy, path);
+  char *token = strtok(path_copy, "/");
+
+  if(token == NULL && (strcmp(path, "/") == 0)){
+    return 0;
+  }else{
+    int found = 0;
+    TreeNode *start_node  = root;
+    TreeNode *curr = NULL;
+
+    while(token != NULL) {
+    	curr = start_node->firstChild;
+      while(curr) {
+      	if(strcmp(curr->name, token) == 0 ){
+          found = 1;
+          break;
+        }
+        curr = curr->nextSibling;
+      }
+
+      token = strtok(NULL, "/");
+
+      if(found) {
+      	if( token == NULL )
+          return 0;
+      }else{
+        if (token)
+        	return -1;
+        else
+        	return 1;
+      }
+
+      start_node = curr;
+      found = 0;
+    }
+  }
+  //If it reaches here, it's not found
+  return -1;
+}
+
 TreeNode* get_node_from_path(const char* path){
   char path_copy[MAX_PATH_LENGTH];
 
@@ -101,7 +149,7 @@ TreeNode* get_node_from_path(const char* path){
       /* If entry not found(not in children of start_node)
       1. Copy the token in a global variable for new entry
       2. Return the parent(start_node)
-      This is required for mkdir where last token is name of the directory
+      This is required for mkdir,create etc. where last token is name of the directory
       and path before that is the parent directory*/
       strcpy(new_entry_name, token);
       return start_node;
@@ -151,50 +199,4 @@ void detach_child(TreeNode* parent, TreeNode* node_to_delete){
       curr=curr->nextSibling;
     }
   }
-}
-
-int validatePath(const char *path)
-{
-        char tmpPath[MAX_PATH_LENGTH];
-        strcpy(tmpPath, path);
-        char *token = strtok(tmpPath, "/");
-
-        if(token == NULL && (strcmp(path, "/") == 0))
-        	return 0;
-        else
-        {
-                int flag = 0;
-                TreeNode *tmpNode  = root;
-                TreeNode *temp = NULL;
-
-                while(token != NULL) {
-                	temp = tmpNode->firstChild;
-                        while(temp) {
-                        	if(strcmp(temp->name, token) == 0 )
-                                {
-                                        flag = 1;
-                                        break;
-                                }
-                                temp = temp->nextSibling;
-                        }
-
-                        token = strtok(NULL, "/");
-
-                        if(flag == 1) {
-                        	if( token == NULL )
-                                	return 0;
-			}
-                        else {
-                                if (token)
-                                	return -1;
-                                else
-                                	return 1;
-                        }
-
-                        tmpNode = temp;
-                        flag = 0;
-                }
-        }
-        //if it came till here then
-        return -1;
 }

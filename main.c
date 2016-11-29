@@ -66,9 +66,9 @@ static struct fuse_operations hello_oper = {
   .rmdir = ramdisk_rmdir,
   .opendir = ramdisk_opendir,
   .unlink = ramdisk_unlink,
+  .rename = ramdisk_rename,
   .utime = ramdisk_utime    /*for touch command*/
 };
-/*rename, fsync*/
 
 
 int main(int argc, char *argv[])
@@ -85,10 +85,9 @@ int main(int argc, char *argv[])
   init_fs();
 
   //Modified argv, as fuse_main takes only first two params(filesystem and mountpoint)
-  char* argv_mod[3];
+  char* argv_mod[2];
   argv_mod[0] = argv[0];
   argv_mod[1] = argv[1];
-  argv_mod[2] = argv[2];
 
 	return fuse_main(argc-1, argv_mod, &hello_oper, NULL);
 }

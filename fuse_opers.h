@@ -24,6 +24,8 @@ int ramdisk_opendir(const char* path, struct fuse_file_info* fi);
 
 int ramdisk_unlink(const char *);
 
+int ramdisk_rename(const char *from, const char *to);
+
 int ramdisk_utime(const char* path, struct utimbuf* ubuf);
 
 #endif
